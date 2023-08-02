@@ -16,4 +16,4 @@ const blogSchema = new mongoose_1.Schema({
     },
 });
 exports.default = (0, mongoose_1.model)("Blog", blogSchema);
-//# sourceMappingURL=blog.js.map
+//# sourceMappingURL=Blog.js.map

@@ -3,6 +3,8 @@ import Blog from "../models/Blog";
 import User from "../models/User";
 import Comment from "../models/Comment";
 import { BlogType, CommentType,UserType } from "../schema/schema";
+import { hashSync } from "bcryptjs";
+import {Document} from 'mongoose';
 const RootQuery = new GraphQLObjectType({
     name: "RootQuery",
     fields:{
@@ -41,7 +43,19 @@ const mutations = new GraphQLObjectType({
                 email: { type: GraphQLNonNull(GraphQLString) },
                 password: { type: GraphQLNonNull(GraphQLString)},
             },
+            async resolve(parent,{name,email,password}) {
+                let existingUser:Document<any,any,any>;
+                try {
+                    existingUser = await User.findOne({email});
+                    if(existingUser) return new Error("User Already exists");
+                    const encryptedPassword = hashSync(password);
+                    const user = new User({name, email, password: encryptedPassword});
+                    return await user.save();
+                } catch(err){
+                    return new Error("User Signup Failed");
+                }
+            },
         },
     },
 });
-export default new GraphQLSchema({ query:RootQuery });
+export default new GraphQLSchema({ query:RootQuery, mutation:mutations });
