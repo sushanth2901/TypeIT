@@ -14,6 +14,11 @@ const blogSchema = new mongoose_1.Schema({
         type: "Date",
         required: true,
     },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    comment: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "Comment" }],
 });
 exports.default = (0, mongoose_1.model)("Blog", blogSchema);
 //# sourceMappingURL=Blog.js.map

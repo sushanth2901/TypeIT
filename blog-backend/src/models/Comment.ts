@@ -10,6 +10,14 @@ const commentSchema:Schema = new Schema({
         required: true,
         
     },
+    blog:{
+        type:Schema.Types.ObjectId,
+        ref:"Blog",
+    },
+    user: {
+        type:Schema.Types.ObjectId,
+        ref:"User",
+    }
     
 });
 
