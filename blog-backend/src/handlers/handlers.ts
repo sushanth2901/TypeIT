@@ -153,7 +153,7 @@ const mutations = new GraphQLObjectType({
                     existingUser.blogs.pull(existingBlog);
                     await existingUser.save(session);
                     
-                    return await Blog.findByIdAndRemove(id);
+                    return await existingBlog.deleteOne({id: existingBlog.id});
 
                 }catch(err){    
                     return new Error(err);
@@ -198,7 +198,37 @@ const mutations = new GraphQLObjectType({
                 }
             },
         },
-        
+        deleteComment: {
+            type: CommentType,
+            args: {
+                id:{type: GraphQLNonNull(GraphQLID)},
+            },
+            async resolve(parent,{id}) {
+               let comment: DocumentType;
+               const session = await startSession();
+               try{
+                session.startTransaction({session});
+                comment = await Comment.findById(id);
+                if(!comment) return new Error("Comment not found");
+                // @ts-ignore
+                const existingUser = await User.findById(comment?.user);
+                if(!existingUser) return new Error("User not found");
+                // @ts-ignore
+                const existingBlog = await Blog.findById(comment?.blog);
+                if(!existingBlog) return new Error("Blog not found");
+                existingUser.comment.pull(comment);
+                existingBlog.comment.pull(comment);
+                await existingUser.save({session});
+                await existingBlog.save({session});
+                return await comment.deleteOne({id: comment.id});
+               }catch(err){ 
+                return new Error(err);
+               } 
+               finally{
+                await session.commitTransaction();
+               }
+            }
+        }
     },
 
 });

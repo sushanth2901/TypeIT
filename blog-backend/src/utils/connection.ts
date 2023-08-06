@@ -6,6 +6,6 @@
         }
         catch(err){
             console.log(err);
-            return err;
+            throw new Error(err);
         }
     }
